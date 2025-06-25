@@ -1,0 +1,494 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ product.name }} - Nym{% endblock %}
+
+{% block body %}
+<div class="container py-3">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('app_products') }}">Tous les produits</a></li>
+            {% if product.categories|length > 0 %}
+                {% set category = product.categories|first %}
+                <li class="breadcrumb-item">
+                    <a href="{{ path('app_products_by_category', {slug: category.slug}) }}">{{ category.name }}</a>
+                </li>
+            {% endif %}
+            <li class="breadcrumb-item active">{{ product.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Product Image -->
+        <div class="col-md-5 mb-4">
+            <div class="product-image-large">
+                {% if product.categories|length > 0 %}
+                    {% set category = product.categories|first %}
+                    {% if category.slug == 'electronique' %}
+                        <i class="fas fa-laptop"></i>
+                    {% elseif category.slug == 'vetements' %}
+                        <i class="fas fa-tshirt"></i>
+                    {% elseif category.slug == 'livres' %}
+                        <i class="fas fa-book"></i>
+                    {% elseif category.slug == 'maison-jardin' %}
+                        <i class="fas fa-seedling"></i>
+                    {% else %}
+                        <i class="fas fa-box"></i>
+                    {% endif %}
+                {% else %}
+                    <i class="fas fa-box"></i>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Product Details -->
+        <div class="col-md-4 mb-4">
+            <div class="product-details">
+                <!-- Title -->
+                <h1 class="product-title-large">{{ product.name }}</h1>
+
+                <!-- Rating -->
+                <div class="product-rating mb-3">
+                    <div class="stars">
+                        {% set rating = random(3, 5) %}
+                        {% for i in 1..5 %}
+                            {% if i <= rating %}
+                                <i class="fas fa-star"></i>
+                            {% else %}
+                                <i class="far fa-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <span class="rating-count">{{ random(100, 2000) }} évaluations</span>
+                </div>
+
+                <!-- Price -->
+                <div class="price-section mb-4">
+                    {% if product.price > 100 %}
+                        {% set discount = random(10, 25) %}
+                        {% set originalPrice = (product.price * (100 + discount) / 100)|round(2) %}
+                        <div class="price-original">{{ originalPrice|number_format(2, ',', ' ') }} €</div>
+                        <div class="discount-badge">-{{ discount }}%</div>
+                    {% endif %}
+                    <div class="price-current">{{ product.price|number_format(2, ',', ' ') }} €</div>
+                    <div class="price-info">Prix TTC</div>
+                </div>
+
+                <!-- Description -->
+                <div class="product-description mb-4">
+                    <h6>À propos de cet article</h6>
+                    <p>{{ product.description }}</p>
+                </div>
+
+                <!-- Features -->
+                <div class="product-features mb-4">
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success me-2"></i>Livraison rapide disponible</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Service client réactif</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Retours gratuits sous 30 jours</li>
+                        {% if product.price > 25 %}
+                            <li><i class="fas fa-check text-success me-2"></i>Livraison GRATUITE</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Purchase Box -->
+        <div class="col-md-3">
+            <div class="purchase-box">
+                <div class="price-box mb-3">
+                    <div class="price-large">{{ product.price|number_format(2, ',', ' ') }} €</div>
+                    {% if product.price > 25 %}
+                        <div class="shipping-info">
+                            <i class="fas fa-truck text-success me-1"></i>
+                            Livraison GRATUITE
+                        </div>
+                    {% else %}
+                        <div class="shipping-info">
+                            <i class="fas fa-truck me-1"></i>
+                            Livraison : 4,99 €
+                        </div>
+                    {% endif %}
+                    <div class="delivery-info">
+                        Livraison le <strong>{{ "now"|date_modify("+1 day")|date("d M") }}</strong>
+                    </div>
+                </div>
+
+                <!-- Stock Status -->
+                <div class="stock-status mb-3">
+                    {% if product.stock > 10 %}
+                        <div class="text-success">
+                            <i class="fas fa-check-circle me-1"></i>
+                            En stock
+                        </div>
+                    {% elseif product.stock > 0 %}
+                        <div class="text-warning">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            Il ne reste plus que {{ product.stock }} exemplaire{{ product.stock > 1 ? 's' : '' }} en stock
+                        </div>
+                    {% else %}
+                        <div class="text-danger">
+                            <i class="fas fa-times-circle me-1"></i>
+                            Temporairement en rupture de stock
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Quantity & Actions -->
+                {% if product.stock > 0 %}
+                    <div class="quantity-section mb-3">
+                        <label class="form-label text-small">Quantité :</label>
+                        <select class="form-select form-select-sm" style="width: 80px;">
+                            {% for i in 1..(product.stock < 10 ? product.stock : 10) %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-cart-plus me-2"></i>Ajouter au panier
+                        </button>
+                        <button class="btn btn-outline-primary">
+                            Acheter maintenant
+                        </button>
+                    </div>
+                {% endif %}
+
+                <!-- Seller Info -->
+                <div class="seller-info mt-4">
+                    <div class="text-small text-muted mb-2">Vendu par</div>
+                    <div class="seller-name">
+                        {{ product.seller.companyName|default(product.seller.firstname ~ ' ' ~ product.seller.lastname) }}
+                    </div>
+                    <div class="seller-rating">
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                        </div>
+                        <span class="text-small text-muted">({{ random(50, 500) }} avis)</span>
+                    </div>
+                </div>
+
+                <!-- Additional Actions -->
+                <div class="additional-actions mt-3">
+                    <button class="btn btn-outline-secondary btn-sm w-100 mb-2">
+                        <i class="fas fa-heart me-2"></i>Ajouter à ma liste
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm w-100">
+                        <i class="fas fa-share me-2"></i>Partager
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Details Tabs -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="product-tabs">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#description-tab">
+                            Description
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#specifications-tab">
+                            Caractéristiques
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#reviews-tab">
+                            Avis clients ({{ random(20, 200) }})
+                        </button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content p-4">
+                    <div class="tab-pane fade show active" id="description-tab">
+                        <h6>Description détaillée</h6>
+                        <p>{{ product.description }}</p>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+                    </div>
+                    
+                    <div class="tab-pane fade" id="specifications-tab">
+                        <h6>Caractéristiques techniques</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <td class="text-muted">Marque</td>
+                                <td>{{ product.seller.companyName|default('Nym') }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Référence</td>
+                                <td>NYM-{{ product.id|default(6, '0', 'left') }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Date de mise en ligne</td>
+                                <td>{{ product.createdAt|date('d/m/Y') }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Catégorie</td>
+                                <td>
+                                    {% for category in product.categories %}
+                                        {{ category.name }}{% if not loop.last %}, {% endif %}
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="tab-pane fade" id="reviews-tab">
+                        <h6>Avis des clients</h6>
+                        <div class="mb-4">
+                           
+                        </div>
+                        
+                        <!-- Sample Reviews -->
+                        <div class="reviews-list">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    {% if relatedProducts|length > 0 %}
+        <div class="row mt-5">
+            <div class="col-12">
+                <h4 class="mb-4">Produits similaires</h4>
+                <div class="row">
+                    {% for relatedProduct in relatedProducts|slice(0, 4) %}
+                        <div class="col-md-3 mb-4">
+                            <div class="product-card">
+                                <div class="product-image">
+                                    {% if relatedProduct.categories|length > 0 %}
+                                        {% set category = relatedProduct.categories|first %}
+                                        {% if category.slug == 'electronique' %}
+                                            <i class="fas fa-laptop"></i>
+                                        {% elseif category.slug == 'vetements' %}
+                                            <i class="fas fa-tshirt"></i>
+                                        {% elseif category.slug == 'livres' %}
+                                            <i class="fas fa-book"></i>
+                                        {% elseif category.slug == 'maison-jardin' %}
+                                            <i class="fas fa-seedling"></i>
+                                        {% else %}
+                                            <i class="fas fa-box"></i>
+                                        {% endif %}
+                                    {% else %}
+                                        <i class="fas fa-box"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="product-info">
+                                    <h6 class="product-title">
+                                        <a href="{{ path('app_product_show', {id: relatedProduct.id}) }}">{{ relatedProduct.name }}</a>
+                                    </h6>
+                                    <div class="product-rating">
+                                        <div class="stars">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                        </div>
+                                        <span class="count">({{ random(10, 100) }})</span>
+                                    </div>
+                                    <div class="product-price">{{ relatedProduct.price|number_format(2, ',', ' ') }} €</div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+/* Product Page Styles */
+.product-image-large {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 6rem;
+    color: var(--text-muted);
+}
+
+.product-title-large {
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 1rem;
+}
+
+.product-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.product-rating .stars {
+    color: #fbbf24;
+    font-size: 0.875rem;
+}
+
+.rating-count {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.price-section {
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 1rem;
+}
+
+.price-original {
+    color: var(--text-muted);
+    text-decoration: line-through;
+    font-size: 0.875rem;
+}
+
+.discount-badge {
+    display: inline-block;
+    background: var(--black);
+    color: var(--white);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    margin-left: 0.5rem;
+}
+
+.price-current {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--black);
+}
+
+.price-info {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.purchase-box {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    background: var(--white);
+    position: sticky;
+    top: 20px;
+}
+
+.price-large {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--black);
+}
+
+.shipping-info, .delivery-info {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+.seller-info {
+    border-top: 1px solid var(--border-light);
+    padding-top: 1rem;
+}
+
+.seller-name {
+    font-weight: 500;
+    color: var(--black);
+}
+
+.product-tabs .nav-tabs {
+    border-bottom: 1px solid var(--border);
+}
+
+.product-tabs .nav-link {
+    color: var(--text-secondary);
+    border: none;
+    padding: 1rem 1.5rem;
+}
+
+.product-tabs .nav-link.active {
+    color: var(--black);
+    border-bottom: 2px solid var(--black);
+    background: none;
+}
+
+.rating-summary {
+    text-align: center;
+    margin-right: 2rem;
+}
+
+.rating-average {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--black);
+}
+
+.rating-bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.progress-sm {
+    height: 8px;
+    width: 100px;
+}
+
+.review-item {
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+
+.review-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.reviewer-name {
+    font-weight: 500;
+}
+
+.review-rating .fas {
+    color: #fbbf24;
+    font-size: 0.75rem;
+}
+
+.review-date {
+    font-size: 0.75rem;
+}
+
+@media (max-width: 768px) {
+    .product-image-large {
+        height: 300px;
+        font-size: 4rem;
+    }
+    
+    .purchase-box {
+        position: static;
+        margin-top: 2rem;
+    }
+    
+    .product-title-large {
+        font-size: 1.25rem;
+    }
+}
+</style>
+{% endblock %}

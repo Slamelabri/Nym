@@ -1,0 +1,232 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nym - Marketplace{% endblock %}
+
+{% block body %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="hero-content">
+                    <h1>Trouvez tout ce dont vous avez besoin</h1>
+                    <p>Des milliers de produits vendus par des professionnels de confiance. Livraison rapide et paiement sécurisé.</p>
+                    <a href="{{ path('app_products') }}" class="btn btn-primary btn-lg">
+                        Parcourir les produits
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="py-4">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Parcourir par catégorie</h2>
+        </div>
+        
+        <div class="categories-grid">
+            {% for category in categories %}
+                <a href="{{ path('app_products_by_category', {slug: category.slug}) }}" class="category-card">
+                    <div class="category-icon">
+                        {% if category.slug == 'electronique' %}
+                            <i class="fas fa-laptop"></i>
+                        {% elseif category.slug == 'vetements' %}
+                            <i class="fas fa-tshirt"></i>
+                        {% elseif category.slug == 'livres' %}
+                            <i class="fas fa-book"></i>
+                        {% elseif category.slug == 'maison-jardin' %}
+                            <i class="fas fa-home"></i>
+                        {% else %}
+                            <i class="fas fa-tag"></i>
+                        {% endif %}
+                    </div>
+                    <div class="category-name">{{ category.name }}</div>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Latest Products Section -->
+<section class="py-4 bg-light">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Nouveautés</h2>
+            <p class="section-subtitle">Découvrez les derniers produits ajoutés</p>
+        </div>
+        
+        <div class="products-grid">
+            {% for product in latestProducts %}
+                <a href="{{ path('app_product_show', {id: product.id}) }}" class="product-card text-decoration-none">
+                    <div class="product-image">
+                        {% if product.categories|length > 0 %}
+                            {% set category = product.categories|first %}
+                            {% if category.slug == 'electronique' %}
+                                <i class="fas fa-laptop"></i>
+                            {% elseif category.slug == 'vetements' %}
+                                <i class="fas fa-tshirt"></i>
+                            {% elseif category.slug == 'livres' %}
+                                <i class="fas fa-book"></i>
+                            {% elseif category.slug == 'maison-jardin' %}
+                                <i class="fas fa-seedling"></i>
+                            {% else %}
+                                <i class="fas fa-box"></i>
+                            {% endif %}
+                        {% else %}
+                            <i class="fas fa-box"></i>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="product-info">
+                        <h3 class="product-title">{{ product.name }}</h3>
+                        
+                        <div class="product-rating">
+                            <div class="stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                            <span class="count">({{ random(10, 500) }})</span>
+                        </div>
+                        
+                        <div class="product-price">{{ product.price|number_format(2, ',', ' ') }} €</div>
+                        
+                        <div class="product-seller">
+                            Vendu par {{ product.seller.companyName ?: (product.seller.firstname ~ ' ' ~ product.seller.lastname) }}
+                        </div>
+                        
+                        <div class="product-actions">
+                            <div class="stock-info {% if product.stock > 10 %}in-stock{% elseif product.stock > 0 %}low-stock{% else %}out-of-stock{% endif %}">
+                                {% if product.stock > 10 %}
+                                    En stock
+                                {% elseif product.stock > 0 %}
+                                    Plus que {{ product.stock }} en stock
+                                {% else %}
+                                    Temporairement en rupture de stock
+                                {% endif %}
+                            </div>
+                            
+                            {% if product.stock > 0 %}
+                                <button class="btn btn-outline-primary btn-sm w-100 mt-2" onclick="event.preventDefault(); event.stopPropagation();">
+                                    Ajouter au panier
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{{ path('app_products') }}" class="btn btn-outline-primary">
+                Voir tous les produits
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Popular Products Section -->
+<section class="py-4">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Produits populaires</h2>
+            <p class="section-subtitle">Les mieux notés par nos clients</p>
+        </div>
+        
+        <div class="products-grid">
+            {% for product in premiumProducts|slice(0, 6) %}
+                <div class="product-card">
+                    <div class="product-image">
+                        {% if product.categories|length > 0 %}
+                            {% set category = product.categories|first %}
+                            {% if category.slug == 'electronique' %}
+                                <i class="fas fa-laptop"></i>
+                            {% elseif category.slug == 'vetements' %}
+                                <i class="fas fa-tshirt"></i>
+                            {% elseif category.slug == 'livres' %}
+                                <i class="fas fa-book"></i>
+                            {% elseif category.slug == 'maison-jardin' %}
+                                <i class="fas fa-seedling"></i>
+                            {% else %}
+                                <i class="fas fa-box"></i>
+                            {% endif %}
+                        {% else %}
+                            <i class="fas fa-box"></i>
+                        {% endif %}
+                        
+                        <span class="position-absolute top-0 start-0 badge bg-primary m-2">
+                            Choix Amazon
+                        </span>
+                    </div>
+                    
+                    <div class="product-info">
+                        <h3 class="product-title">
+                            <a href="{{ path('app_product_show', {id: product.id}) }}">{{ product.name }}</a>
+                        </h3>
+                        
+                        <div class="product-rating">
+                            <div class="stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="count">({{ random(100, 1000) }})</span>
+                        </div>
+                        
+                        <div>
+                            {% set originalPrice = (product.price * 1.2)|round(2) %}
+                            <span class="product-price-small">{{ originalPrice|number_format(2, ',', ' ') }} €</span>
+                            <span class="product-price">{{ product.price|number_format(2, ',', ' ') }} €</span>
+                        </div>
+                        
+                        <div class="product-seller">
+                            Vendu par {{ product.seller.companyName ?: (product.seller.firstname ~ ' ' ~ product.seller.lastname) }}
+                        </div>
+                        
+                        <div class="product-actions">
+                            <div class="stock-info in-stock">
+                                Livraison GRATUITE demain
+                            </div>
+                            
+                            <button class="btn btn-primary btn-sm w-100 mt-2">
+                                Ajouter au panier
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Quick Stats -->
+<section class="py-4 bg-light">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-6 col-md-3 mb-3">
+                <div class="h4 mb-1">{{ latestProducts|length }}+</div>
+                <div class="text-small text-muted">Produits</div>
+            </div>
+            <div class="col-6 col-md-3 mb-3">
+                <div class="h4 mb-1">24h</div>
+                <div class="text-small text-muted">Livraison</div>
+            </div>
+            <div class="col-6 col-md-3 mb-3">
+                <div class="h4 mb-1">100%</div>
+                <div class="text-small text-muted">Sécurisé</div>
+            </div>
+            <div class="col-6 col-md-3 mb-3">
+                <div class="h4 mb-1">500+</div>
+                <div class="text-small text-muted">Vendeurs</div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

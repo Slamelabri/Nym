@@ -1,17 +1,178 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+<html lang="fr" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Nym - Marketplace{% endblock %}</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>📦</text></svg>">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    {% block stylesheets %}
+        <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+    {% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <!-- Logo -->
+            <a class="navbar-brand" href="{{ path('app_home') }}">
+                📦 Nym
+            </a>
+            
+            <!-- Mobile toggle -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Main Navigation -->
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_home') }}">Accueil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_products') }}">Tous les produits</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            Catégories
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ path('app_products_by_category', {slug: 'livres'}) }}">Livres</a></li>
+                            <li><a class="dropdown-item" href="{{ path('app_products_by_category', {slug: 'maison-jardin'}) }}">Maison & Jardin</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                
+                <!-- Search Bar -->
+                <form class="d-flex me-3" action="{{ path('app_products_search') }}" method="GET" style="min-width: 300px;">
+                    <div class="input-group">
+                        <input class="form-control" type="search" name="q" placeholder="Rechercher des produits..." style="font-size: 0.875rem;">
+                        <button class="btn btn-outline-primary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- User Actions -->
+                <div class="d-flex align-items-center gap-2">
+                    <!-- Theme Toggle -->
+                    <button class="btn btn-outline-primary btn-sm" data-controller="theme" data-action="click->theme#toggle" title="Changer le thème">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    
+                    <!-- Cart -->
+                    <a href="#" class="btn btn-outline-primary btn-sm position-relative">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-dark" style="font-size: 0.6rem;">
+                            0
+                        </span>
+                    </a>
+                    
+                    <!-- Account -->
+                    <div class="dropdown">
+                        <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user"></i> Compte
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#">Se connecter</a></li>
+                            <li><a class="dropdown-item" href="#">S'inscrire</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">Vendre sur Nym</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
-    </head>
-    <body>
+    <!-- Main Content -->
+    <main>
         {% block body %}{% endblock %}
-    </body>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 mb-4">
+                    <h6>À propos</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#">Qui sommes-nous</a></li>
+                        <li><a href="#">Carrières</a></li>
+                        <li><a href="#">Presse</a></li>
+                        <li><a href="#">Relations investisseurs</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h6>Gagner de l'argent</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#">Vendre sur Nym</a></li>
+                        <li><a href="#">Devenir partenaire</a></li>
+                        <li><a href="#">Programme d'affiliation</a></li>
+                        <li><a href="#">Publicité</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h6>Aide et contact</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#">Service client</a></li>
+                        <li><a href="#">Gérer le contenu et les appareils</a></li>
+                        <li><a href="#">Aide Nym</a></li>
+                        <li><a href="#">Nous contacter</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h6>Moyens de paiement</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#">Cartes de crédit</a></li>
+                        <li><a href="#">Cartes cadeaux</a></li>
+                        <li><a href="#">Paiement en plusieurs fois</a></li>
+                        <li><a href="#">Portefeuille</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <hr class="my-4">
+            
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="navbar-brand h6 mb-0">📦 Nym</span>
+                        <select class="form-select form-select-sm" style="width: auto;">
+                            <option>🇫🇷 Français</option>
+                            <option>🇬🇧 English</option>
+                            <option>🇪🇸 Español</option>
+                        </select>
+                        <select class="form-select form-select-sm" style="width: auto;">
+                            <option>EUR €</option>
+                            <option>USD $</option>
+                            <option>GBP £</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="text-xs text-muted">
+                        Conditions d'utilisation | Vente et remboursements | Avis légal | Protection des données personnelles | Cookies | Annonces basées sur vos centres d'intérêt
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-3">
+                <p class="text-xs text-muted mb-0">© 2025 Nym, Inc. ou ses filiales</p>
+            </div>
+        </div>
+    </footer>
+
+    {% block javascripts %}
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Font Awesome -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+        {{ importmap('app') }}
+    {% endblock %}
+</body>
 </html>
