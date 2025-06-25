@@ -1,0 +1,275 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inscription - {{ parent() }}{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="auth-card">
+                <div class="text-center mb-4">
+                    <h1 class="h3 mb-3">Créer un compte</h1>
+                    <p class="text-muted">Rejoignez la communauté Nym</p>
+                </div>
+
+                {% if error %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </div>
+                {% endif %}
+
+                <form method="post" data-turbo="false">
+                    <!-- Type de compte -->
+                    <div class="mb-4">
+                        <label class="form-label">Type de compte</label>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="account-type-card" data-type="client">
+                                    <input type="radio" name="account_type" value="client" id="client" class="account-type-input" checked>
+                                    <label for="client" class="account-type-label">
+                                        <i class="fas fa-user fa-2x mb-2"></i>
+                                        <h6>Client</h6>
+                                        <p class="text-small">Acheter des produits</p>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="account-type-card" data-type="pro">
+                                    <input type="radio" name="account_type" value="pro" id="pro" class="account-type-input">
+                                    <label for="pro" class="account-type-label">
+                                        <i class="fas fa-store fa-2x mb-2"></i>
+                                        <h6>Professionnel</h6>
+                                        <p class="text-small">Vendre des produits</p>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informations personnelles -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="first_name" class="form-label">Prénom</label>
+                            <input type="text" name="first_name" id="first_name" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="last_name" class="form-label">Nom</label>
+                            <input type="text" name="last_name" id="last_name" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Adresse email</label>
+                        <input type="email" name="email" id="email" class="form-control" required>
+                    </div>
+
+                    <!-- Champ entreprise (pour les pros uniquement) -->
+                    <div class="mb-3" id="company-field" style="display: none;">
+                        <label for="company_name" class="form-label">Nom de l'entreprise</label>
+                        <input type="text" name="company_name" id="company_name" class="form-control">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="password" class="form-label">Mot de passe</label>
+                            <input type="password" name="password" id="password" class="form-control" required>
+                            <div class="form-text">Au moins 6 caractères</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="confirm_password" class="form-label">Confirmer le mot de passe</label>
+                            <input type="password" name="confirm_password" id="confirm_password" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="terms" required>
+                        <label class="form-check-label" for="terms">
+                            J'accepte les <a href="#" class="text-decoration-none">conditions d'utilisation</a> et la <a href="#" class="text-decoration-none">politique de confidentialité</a>
+                        </label>
+                    </div>
+
+                    <div class="d-grid">
+                        <button class="btn btn-primary btn-lg" type="submit">
+                            Créer mon compte
+                        </button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-4">
+                    <p class="text-muted">
+                        Déjà un compte ?
+                        <a href="{{ path('app_login') }}" class="text-decoration-none">Se connecter</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.auth-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: var(--shadow);
+}
+
+[data-bs-theme="dark"] .auth-card {
+    background: var(--bg-secondary);
+    border-color: var(--border);
+}
+
+.account-type-card {
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    height: 100%;
+}
+
+.account-type-card:hover {
+    border-color: var(--anthracite);
+}
+
+.account-type-card.active {
+    border-color: var(--black);
+    background: var(--bg-secondary);
+}
+
+[data-bs-theme="dark"] .account-type-card.active {
+    border-color: var(--white);
+    background: var(--bg-tertiary);
+}
+
+.account-type-input {
+    display: none;
+}
+
+.account-type-label {
+    display: block;
+    margin: 0;
+    cursor: pointer;
+    color: var(--text-primary);
+}
+
+.account-type-label i {
+    color: var(--anthracite);
+}
+
+.account-type-card.active .account-type-label i {
+    color: var(--black);
+}
+
+[data-bs-theme="dark"] .account-type-card.active .account-type-label i {
+    color: var(--white);
+}
+
+.account-type-label h6 {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.account-type-label p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.form-label {
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.form-control {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus {
+    border-color: var(--black);
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+    background: var(--white);
+}
+
+[data-bs-theme="dark"] .form-control {
+    background: var(--bg-tertiary);
+    border-color: var(--border);
+    color: var(--text-primary);
+}
+
+[data-bs-theme="dark"] .form-control:focus {
+    border-color: var(--white);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+    background: var(--bg-primary);
+}
+
+.form-text {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+
+.form-check-input:checked {
+    background-color: var(--black);
+    border-color: var(--black);
+}
+
+[data-bs-theme="dark"] .form-check-input:checked {
+    background-color: var(--white);
+    border-color: var(--white);
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+    border-radius: 8px;
+}
+
+[data-bs-theme="dark"] .alert-danger {
+    background-color: #2c1517;
+    border-color: #842029;
+    color: #ea868f;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const accountTypeInputs = document.querySelectorAll('.account-type-input');
+    const companyField = document.getElementById('company-field');
+    const companyInput = document.getElementById('company_name');
+    
+    accountTypeInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            // Retirer la classe active de tous les cards
+            document.querySelectorAll('.account-type-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            // Ajouter la classe active au card sélectionné
+            this.closest('.account-type-card').classList.add('active');
+            
+            // Afficher/masquer le champ entreprise
+            if (this.value === 'pro') {
+                companyField.style.display = 'block';
+                companyInput.required = true;
+            } else {
+                companyField.style.display = 'none';
+                companyInput.required = false;
+                companyInput.value = '';
+            }
+        });
+    });
+    
+    // Initialiser l'état par défaut
+    document.querySelector('.account-type-input:checked').closest('.account-type-card').classList.add('active');
+});
+</script>
+{% endblock %}

@@ -1,0 +1,374 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon panier - Nym{% endblock %}
+
+{% block body %}
+<div class="container py-3">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Accueil</a></li>
+            <li class="breadcrumb-item active">Mon panier</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h1 class="h3 mb-0">Mon panier</h1>
+                {% if cart and not cart.isEmpty %}
+                    <form method="post" action="{{ path('app_cart_clear') }}" class="d-inline">
+                        <button type="submit" class="btn btn-outline-danger btn-sm" 
+                                onclick="return confirm('Êtes-vous sûr de vouloir vider votre panier ?')">
+                            <i class="fas fa-trash me-1"></i>Vider le panier
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+
+            <!-- Messages d'erreur -->
+            {% if errors|length > 0 %}
+                <div class="alert alert-warning">
+                    <h6><i class="fas fa-exclamation-triangle me-2"></i>Attention !</h6>
+                    <ul class="mb-0">
+                        {% for error in errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <!-- Panier vide -->
+            {% if not cart or cart.isEmpty %}
+                <div class="text-center py-5">
+                    <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                    <h4>Votre panier est vide</h4>
+                    <p class="text-muted mb-4">Découvrez nos produits et ajoutez-les à votre panier !</p>
+                    <a href="{{ path('app_products') }}" class="btn btn-primary">
+                        <i class="fas fa-shopping-bag me-2"></i>Parcourir les produits
+                    </a>
+                </div>
+            {% else %}
+                <!-- Items du panier -->
+                <div class="cart-items">
+                    {% for item in cart.cartItems %}
+                        <div class="cart-item" data-product-id="{{ item.product.id }}">
+                            <div class="row align-items-center">
+                                <!-- Image produit -->
+                                <div class="col-md-2 mb-3">
+                                    <div class="product-image-small">
+                                        {% if item.product.categories|length > 0 %}
+                                            {% set category = item.product.categories|first %}
+                                            {% if category.slug == 'electronique' %}
+                                                <i class="fas fa-laptop"></i>
+                                            {% elseif category.slug == 'vetements' %}
+                                                <i class="fas fa-tshirt"></i>
+                                            {% elseif category.slug == 'livres' %}
+                                                <i class="fas fa-book"></i>
+                                            {% elseif category.slug == 'maison-jardin' %}
+                                                <i class="fas fa-seedling"></i>
+                                            {% else %}
+                                                <i class="fas fa-box"></i>
+                                            {% endif %}
+                                        {% else %}
+                                            <i class="fas fa-box"></i>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Détails produit -->
+                                <div class="col-md-4 mb-3">
+                                    <h6 class="product-title">
+                                        <a href="{{ path('app_product_show', {id: item.product.id}) }}">
+                                            {{ item.product.name }}
+                                        </a>
+                                    </h6>
+                                    <div class="text-muted text-small">
+                                        Vendu par {{ item.product.seller.companyName ?: (item.product.seller.firstname ~ ' ' ~ item.product.seller.lastname) }}
+                                    </div>
+                                    <div class="text-success text-small">
+                                        <i class="fas fa-check-circle me-1"></i>En stock
+                                    </div>
+                                </div>
+
+                                <!-- Quantité -->
+                                <div class="col-md-2 mb-3">
+                                    <div class="quantity-controls">
+                                        <form method="post" action="{{ path('app_cart_update', {id: item.product.id}) }}" class="d-inline">
+                                            <div class="input-group input-group-sm">
+                                                <button type="button" class="btn btn-outline-secondary quantity-minus" data-product-id="{{ item.product.id }}">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                                <input type="number" name="quantity" value="{{ item.quantity }}" 
+                                                       min="1" max="{{ item.product.stock }}" 
+                                                       class="form-control text-center quantity-input" 
+                                                       data-product-id="{{ item.product.id }}">
+                                                <button type="button" class="btn btn-outline-secondary quantity-plus" data-product-id="{{ item.product.id }}">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <!-- Prix unitaire -->
+                                <div class="col-md-2 mb-3 text-end">
+                                    <div class="price-unit">{{ item.product.price|number_format(2, ',', ' ') }} €</div>
+                                </div>
+
+                                <!-- Prix total -->
+                                <div class="col-md-2 mb-3 text-end">
+                                    <div class="price-total" data-product-id="{{ item.product.id }}">
+                                        {{ item.totalPrice|number_format(2, ',', ' ') }} €
+                                    </div>
+                                    <form method="post" action="{{ path('app_cart_remove', {id: item.product.id}) }}" class="d-inline">
+                                        <button type="submit" class="btn btn-link text-danger p-0 mt-1" 
+                                                onclick="return confirm('Supprimer cet article ?')"
+                                                title="Supprimer">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% if not loop.last %}
+                            <hr class="my-3">
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Résumé du panier -->
+        {% if cart and not cart.isEmpty %}
+            <div class="col-md-4">
+                <div class="cart-summary">
+                    <h5 class="mb-3">Récapitulatif de la commande</h5>
+                    
+                    <div class="summary-line">
+                        <span>Articles ({{ totalItems }})</span>
+                        <span>{{ totalPrice|number_format(2, ',', ' ') }} €</span>
+                    </div>
+                    
+                    <div class="summary-line">
+                        <span>Livraison</span>
+                        <span>
+                            {% if totalPrice >= 25 %}
+                                <span class="text-success">GRATUITE</span>
+                            {% else %}
+                                4,99 €
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="summary-total">
+                        <span>Total</span>
+                        <span>{{ (totalPrice + (totalPrice >= 25 ? 0 : 4.99))|number_format(2, ',', ' ') }} €</span>
+                    </div>
+                    
+                    <div class="d-grid gap-2 mt-3">
+                        <a href="{{ path('app_cart_checkout') }}" class="btn btn-primary">
+                            <i class="fas fa-lock me-2"></i>Passer la commande
+                        </a>
+                        <a href="{{ path('app_products') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Continuer mes achats
+                        </a>
+                    </div>
+                    
+                    <!-- Informations de livraison -->
+                    <div class="delivery-info mt-3">
+                        <div class="text-small">
+                            <i class="fas fa-truck text-success me-2"></i>
+                            {% if totalPrice >= 25 %}
+                                Livraison gratuite demain
+                            {% else %}
+                                Livraison en 24h pour 4,99 €
+                            {% endif %}
+                        </div>
+                        <div class="text-small text-muted mt-1">
+                            <i class="fas fa-shield-alt me-2"></i>
+                            Paiement 100% sécurisé
+                        </div>
+                        <div class="text-small text-muted mt-1">
+                            <i class="fas fa-undo me-2"></i>
+                            Retours gratuits sous 30 jours
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.cart-item {
+    background: var(--white);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.product-image-small {
+    width: 80px;
+    height: 80px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--text-muted);
+}
+
+.product-title a {
+    color: var(--text-primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.product-title a:hover {
+    color: var(--black);
+}
+
+.quantity-controls .input-group {
+    width: 100px;
+}
+
+.quantity-input {
+    text-align: center;
+    padding: 0.25rem;
+}
+
+.price-unit {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.price-total {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--black);
+}
+
+.cart-summary {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    position: sticky;
+    top: 20px;
+}
+
+.summary-line {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--black);
+}
+
+.delivery-info {
+    background: var(--bg-secondary);
+    border-radius: 4px;
+    padding: 0.75rem;
+}
+
+/* Mode sombre */
+[data-bs-theme="dark"] .cart-item,
+[data-bs-theme="dark"] .cart-summary {
+    background: var(--bg-secondary);
+    border-color: var(--border);
+}
+
+[data-bs-theme="dark"] .delivery-info {
+    background: var(--bg-tertiary);
+}
+
+@media (max-width: 768px) {
+    .cart-summary {
+        position: static;
+        margin-top: 2rem;
+    }
+    
+    .cart-item .row > div {
+        text-align: center;
+    }
+    
+    .cart-item .row > div:last-child {
+        text-align: center;
+    }
+}
+</style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Gestion des quantités avec AJAX
+        document.addEventListener('DOMContentLoaded', function() {
+            // Boutons + et -
+            document.querySelectorAll('.quantity-plus, .quantity-minus').forEach(button => {
+                button.addEventListener('click', function() {
+                    const productId = this.dataset.productId;
+                    const input = document.querySelector(`input[data-product-id="${productId}"]`);
+                    const currentValue = parseInt(input.value);
+                    
+                    if (this.classList.contains('quantity-plus')) {
+                        input.value = currentValue + 1;
+                    } else if (this.classList.contains('quantity-minus') && currentValue > 1) {
+                        input.value = currentValue - 1;
+                    }
+                    
+                    updateQuantity(productId, input.value);
+                });
+            });
+            
+            // Changement direct dans l'input
+            document.querySelectorAll('.quantity-input').forEach(input => {
+                input.addEventListener('change', function() {
+                    const productId = this.dataset.productId;
+                    updateQuantity(productId, this.value);
+                });
+            });
+        });
+        
+        function updateQuantity(productId, quantity) {
+            fetch(`/cart/update-ajax/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `quantity=${quantity}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Mettre à jour le prix total de l'article
+                    const priceElement = document.querySelector(`[data-product-id="${productId}"].price-total`);
+                    if (priceElement) {
+                        priceElement.textContent = data.itemTotal;
+                    }
+                    
+                    // Recharger la page pour mettre à jour le résumé
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+            });
+        }
+    </script>
+{% endblock %}

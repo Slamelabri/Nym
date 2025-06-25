@@ -137,7 +137,7 @@
             {% if products|length > 0 %}
                 <div class="products-grid">
                     {% for product in products %}
-                        <div class="product-card">
+                        <a href="{{ path('app_product_show', {id: product.id}) }}" class="product-card text-decoration-none">
                             <div class="product-image">
                                 {% if product.categories|length > 0 %}
                                     {% set category = product.categories|first %}
@@ -165,9 +165,7 @@
                             </div>
                             
                             <div class="product-info">
-                                <h3 class="product-title">
-                                    <a href="{{ path('app_product_show', {id: product.id}) }}">{{ product.name }}</a>
-                                </h3>
+                                <h3 class="product-title">{{ product.name }}</h3>
                                 
                                 <div class="product-rating">
                                     <div class="stars">
@@ -214,9 +212,18 @@
                                     </div>
                                     
                                     {% if product.stock > 0 %}
-                                        <button class="btn btn-primary btn-sm w-100 mt-2">
-                                            Ajouter au panier
-                                        </button>
+                                        {% if app.user %}
+                                            <form method="post" action="{{ path('app_cart_add', {id: product.id}) }}" class="d-inline">
+                                                <input type="hidden" name="quantity" value="1">
+                                                <button type="submit" class="btn btn-primary btn-sm w-100 mt-2" onclick="event.preventDefault(); event.stopPropagation(); this.form.submit();">
+                                                    Ajouter au panier
+                                                </button>
+                                            </form>
+                                        {% else %}
+                                            <a href="{{ path('app_login') }}" class="btn btn-outline-primary btn-sm w-100 mt-2" onclick="event.preventDefault(); event.stopPropagation();">
+                                                Se connecter
+                                            </a>
+                                        {% endif %}
                                     {% endif %}
                                 </div>
                                 
@@ -224,7 +231,7 @@
                                     Ajouté le {{ product.createdAt|date('d/m/Y') }}
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     {% endfor %}
                 </div>
 

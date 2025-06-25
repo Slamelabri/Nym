@@ -140,7 +140,7 @@
                 {% if product.stock > 0 %}
                     <div class="quantity-section mb-3">
                         <label class="form-label text-small">Quantité :</label>
-                        <select class="form-select form-select-sm" style="width: 80px;">
+                        <select class="form-select form-select-sm" id="quantity-select" style="width: 80px;">
                             {% for i in 1..(product.stock < 10 ? product.stock : 10) %}
                                 <option value="{{ i }}">{{ i }}</option>
                             {% endfor %}
@@ -148,12 +148,21 @@
                     </div>
 
                     <div class="d-grid gap-2">
-                        <button class="btn btn-primary">
-                            <i class="fas fa-cart-plus me-2"></i>Ajouter au panier
-                        </button>
-                        <button class="btn btn-outline-primary">
-                            Acheter maintenant
-                        </button>
+                        {% if app.user %}
+                            <form method="post" action="{{ path('app_cart_add', {id: product.id}) }}" class="d-inline">
+                                <input type="hidden" name="quantity" id="quantity-input" value="1">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-cart-plus me-2"></i>Ajouter au panier
+                                </button>
+                            </form>
+                            <button class="btn btn-outline-primary" disabled>
+                                Acheter maintenant
+                            </button>
+                        {% else %}
+                            <a href="{{ path('app_login') }}" class="btn btn-primary">
+                                <i class="fas fa-sign-in-alt me-2"></i>Se connecter pour acheter
+                            </a>
+                        {% endif %}
                     </div>
                 {% endif %}
 
@@ -251,7 +260,23 @@
                         
                         <!-- Sample Reviews -->
                         <div class="reviews-list">
-                            
+                            <div class="review-item">
+                                <div class="review-header">
+                                    <div class="reviewer-name">Jean D.</div>
+                                    <div class="review-rating">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <div class="review-date text-muted">{{ random(1, 30) }} jours</div>
+                                </div>
+                                <div class="review-content">
+                                    <p class="mb-2"><strong>Excellent produit</strong></p>
+                                    <p class="text-small">Très satisfait de mon achat. La qualité est au rendez-vous et la livraison était rapide. Je baise vos mères</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -310,6 +335,23 @@
         </div>
     {% endif %}
 </div>
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const quantitySelect = document.getElementById('quantity-select');
+            const quantityInput = document.getElementById('quantity-input');
+            
+            if (quantitySelect && quantityInput) {
+                quantitySelect.addEventListener('change', function() {
+                    quantityInput.value = this.value;
+                });
+            }
+        });
+    </script>
+{% endblock %}
 
 <style>
 /* Product Page Styles */

@@ -48,6 +48,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Product::class, mappedBy: 'seller', orphanRemoval: true)]
     private Collection $products;
 
+    #[ORM\OneToOne(mappedBy: 'owner', cascade: ['persist', 'remove'])]
+    private ?Cart $cart = null;
+
     public function __construct()
     {
         $this->products = new ArrayCollection();
@@ -199,6 +202,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $product->setSeller(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCart(): ?Cart
+    {
+        return $this->cart;
+    }
+
+    public function setCart(Cart $cart): static
+    {
+        // set the owning side of the relation if necessary
+        if ($cart->getOwner() !== $this) {
+            $cart->setOwner($this);
+        }
+
+        $this->cart = $cart;
 
         return $this;
     }

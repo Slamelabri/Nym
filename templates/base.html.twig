@@ -24,7 +24,7 @@
             
             <!-- Mobile toggle -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <i class="fas fa-bars"></i>
+                <span class="navbar-toggler-icon"></span>
             </button>
             
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -41,6 +41,8 @@
                             Catégories
                         </a>
                         <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ path('app_products_by_category', {slug: 'electronique'}) }}">Électronique</a></li>
+                            <li><a class="dropdown-item" href="{{ path('app_products_by_category', {slug: 'vetements'}) }}">Vêtements</a></li>
                             <li><a class="dropdown-item" href="{{ path('app_products_by_category', {slug: 'livres'}) }}">Livres</a></li>
                             <li><a class="dropdown-item" href="{{ path('app_products_by_category', {slug: 'maison-jardin'}) }}">Maison & Jardin</a></li>
                         </ul>
@@ -65,24 +67,57 @@
                     </button>
                     
                     <!-- Cart -->
-                    <a href="#" class="btn btn-outline-primary btn-sm position-relative">
+                    <a href="{{ path('app_cart_index') }}" class="btn btn-outline-primary btn-sm position-relative">
                         <i class="fas fa-shopping-cart"></i>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-dark" style="font-size: 0.6rem;">
-                            0
-                        </span>
+                        {% if app.user %}
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-dark cart-count" style="font-size: 0.6rem;" id="cart-count">
+                                {{ app.user.cart ? app.user.cart.totalItems : 0 }}
+                            </span>
+                        {% else %}
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-dark" style="font-size: 0.6rem;">
+                                0
+                            </span>
+                        {% endif %}
                     </a>
                     
                     <!-- Account -->
                     <div class="dropdown">
-                        <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user"></i> Compte
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#">Se connecter</a></li>
-                            <li><a class="dropdown-item" href="#">S'inscrire</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#">Vendre sur Nym</a></li>
-                        </ul>
+                        {% if app.user %}
+                            <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user"></i> {{ app.user.firstname }}
+                                {% if 'ROLE_PRO' in app.user.roles %}
+                                    <span class="badge bg-secondary ms-1">PRO</span>
+                                {% endif %}
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><h6 class="dropdown-header">{{ app.user.firstname }} {{ app.user.lastname }}</h6></li>
+                                <li><span class="dropdown-item-text text-muted">{{ app.user.email }}</span></li>
+                                <li><hr class="dropdown-divider"></li>
+                                {% if 'ROLE_PRO' in app.user.roles %}
+                                    <li><a class="dropdown-item" href="#"><i class="fas fa-store me-2"></i>Mon espace PRO</a></li>
+                                    <li><a class="dropdown-item" href="#"><i class="fas fa-plus me-2"></i>Ajouter un produit</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                {% endif %}
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Mon profil</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-shopping-bag me-2"></i>Mes commandes</a></li>
+                                {% if 'ROLE_ADMIN' in app.user.roles %}
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="#"><i class="fas fa-cogs me-2"></i>Administration</a></li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ path('app_logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Déconnexion</a></li>
+                            </ul>
+                        {% else %}
+                            <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user"></i> Compte
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{{ path('app_login') }}"><i class="fas fa-sign-in-alt me-2"></i>Se connecter</a></li>
+                                <li><a class="dropdown-item" href="{{ path('app_register') }}"><i class="fas fa-user-plus me-2"></i>S'inscrire</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ path('app_register') }}"><i class="fas fa-store me-2"></i>Vendre sur Nym</a></li>
+                            </ul>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -90,12 +125,12 @@
     </nav>
 
     <!-- Main Content -->
-    <main>
+    <main class="py-4">
         {% block body %}{% endblock %}
     </main>
 
     <!-- Footer -->
-    <footer class="py-5">
+    <footer class="bg-light py-4">
         <div class="container">
             <div class="row">
                 <div class="col-md-3 mb-4">
@@ -136,7 +171,7 @@
                 </div>
             </div>
             
-            <hr class="my-4">
+            <hr class="my-3">
             
             <div class="row align-items-center">
                 <div class="col-md-6">
@@ -161,7 +196,7 @@
                 </div>
             </div>
             
-            <div class="text-center mt-3">
+            <div class="text-center mt-2">
                 <p class="text-xs text-muted mb-0">© 2025 Nym, Inc. ou ses filiales</p>
             </div>
         </div>
